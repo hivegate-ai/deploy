@@ -1,4 +1,4 @@
-# Kustomize overlay for agents-gateway
+# Kustomize overlay for hivegate
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
@@ -8,20 +8,20 @@ resources:
   - namespace.yaml
 
 # Deploy to this namespace
-namespace: agents-gateway
+namespace: hivegate
 
 # Prefix all resource names
-namePrefix: agents-gateway-
+namePrefix: hivegate-
 
 # Common labels for this project
 commonLabels:
-  app.kubernetes.io/name: agents-gateway
+  app.kubernetes.io/name: hivegate
   app.kubernetes.io/component: api
 
 # Image configuration (tag is set during deployment)
 images:
   - name: placeholder
-    newName: ghcr.io/liberzon/agents-gateway
+    newName: ghcr.io/hivegate-ai/hivegate
     newTag: latest
 
 # ConfigMap customization

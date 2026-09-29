@@ -15,7 +15,7 @@ on:
       project:
         description: 'Project name (from projects.yaml)'
         required: true
-        default: 'agents-gateway'
+        default: 'hivegate'
       environment:
         description: 'Deployment environment'
         required: true
@@ -70,7 +70,7 @@ jobs:
       - name: Determine project name
         id: project
         run: |
-          PROJECT="${{ inputs.project || 'agents-gateway' }}"
+          PROJECT="${{ inputs.project || 'hivegate' }}"
           echo "name=${PROJECT}" >> $GITHUB_OUTPUT
 
       - name: Parse project configuration
@@ -145,7 +145,7 @@ jobs:
       id-token: write
 
     env:
-      PROJECT: ${{ inputs.project || 'agents-gateway' }}
+      PROJECT: ${{ inputs.project || 'hivegate' }}
       ENVIRONMENT: ${{ inputs.environment || 'production' }}
       IMAGE_TAG: ${{ inputs.image_tag || 'latest' }}
 
@@ -214,16 +214,16 @@ jobs:
         env:
           ENV_SECRETS_JSON: ${{ needs.load-config.outputs.env_secrets }}
           # Pass all potential secrets - workflow will pick the ones it needs
-          DB_USER_AGENTS_GATEWAY: ${{ secrets.DB_USER_AGENTS_GATEWAY }}
-          DB_PASS_AGENTS_GATEWAY: ${{ secrets.DB_PASS_AGENTS_GATEWAY }}
-          DB_HOST_AGENTS_GATEWAY: ${{ secrets.DB_HOST_AGENTS_GATEWAY }}
-          DB_PORT_AGENTS_GATEWAY: ${{ secrets.DB_PORT_AGENTS_GATEWAY }}
-          DB_DATABASE_AGENTS_GATEWAY: ${{ secrets.DB_DATABASE_AGENTS_GATEWAY }}
-          SERVICE_PROMPTS_AGENTS_GATEWAY: ${{ secrets.SERVICE_PROMPTS_AGENTS_GATEWAY }}
-          GOOGLE_API_KEY_AGENTS_GATEWAY: ${{ secrets.GOOGLE_API_KEY_AGENTS_GATEWAY }}
-          QDRANT_URL_AGENTS_GATEWAY: ${{ secrets.QDRANT_URL_AGENTS_GATEWAY }}
-          QDRANT_API_KEY_AGENTS_GATEWAY: ${{ secrets.QDRANT_API_KEY_AGENTS_GATEWAY }}
-          SECRET_TOKEN_ENC_KEY_AGENTS_GATEWAY: ${{ secrets.SECRET_TOKEN_ENC_KEY_AGENTS_GATEWAY }}
+          DB_USER_HIVEGATE: ${{ secrets.DB_USER_HIVEGATE }}
+          DB_PASS_HIVEGATE: ${{ secrets.DB_PASS_HIVEGATE }}
+          DB_HOST_HIVEGATE: ${{ secrets.DB_HOST_HIVEGATE }}
+          DB_PORT_HIVEGATE: ${{ secrets.DB_PORT_HIVEGATE }}
+          DB_DATABASE_HIVEGATE: ${{ secrets.DB_DATABASE_HIVEGATE }}
+          SERVICE_PROMPTS_HIVEGATE: ${{ secrets.SERVICE_PROMPTS_HIVEGATE }}
+          GOOGLE_API_KEY_HIVEGATE: ${{ secrets.GOOGLE_API_KEY_HIVEGATE }}
+          QDRANT_URL_HIVEGATE: ${{ secrets.QDRANT_URL_HIVEGATE }}
+          QDRANT_API_KEY_HIVEGATE: ${{ secrets.QDRANT_API_KEY_HIVEGATE }}
+          SECRET_TOKEN_ENC_KEY_HIVEGATE: ${{ secrets.SECRET_TOKEN_ENC_KEY_HIVEGATE }}
           # Legacy secrets (for backward compatibility)
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASS: ${{ secrets.DB_PASS }}

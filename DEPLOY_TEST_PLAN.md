@@ -2,7 +2,7 @@
 
 A runnable smoke-test playbook for the three one-click deploy buttons that
 ship from this repo: **Render**, **Railway**, and **Koyeb**. All three deploy
-the prebuilt image `ghcr.io/liberzon/agents-gateway:latest` via the platform
+the prebuilt image `ghcr.io/hivegate-ai/hivegate:latest` via the platform
 configs in this repo (`render.yaml`, `railway.toml` + wrapper `Dockerfile`,
 `koyeb.yaml`).
 
@@ -26,12 +26,12 @@ provisioning differs.
 
 ## Render (easiest — best for first try)
 
-**Button** → <https://render.com/deploy?repo=https://github.com/liberzon/agents-gateway-deploy>
+**Button** → <https://render.com/deploy?repo=https://github.com/hivegate-ai/deploy>
 
 1. Render opens with the blueprint detected (`render.yaml`). Click **Apply**.
 2. Add a **Render Postgres** instance (Dashboard → New → PostgreSQL → Free
    tier).
-3. On the agents-gateway service → **Environment**, fill the `sync: false`
+3. On the hivegate service → **Environment**, fill the `sync: false`
    vars:
    - `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASS` / `DB_DATABASE` — from
      your Postgres "Connect" panel.
@@ -52,12 +52,12 @@ provisioning differs.
 
 ## Railway (next easiest — best Postgres UX)
 
-**Button** → <https://railway.app/template?template=https://github.com/liberzon/agents-gateway-deploy>
+**Button** → <https://railway.app/template?template=https://github.com/hivegate-ai/deploy>
 
 1. Railway clones the deploy repo, sees `railway.toml`, builds the wrapper
    `Dockerfile` (fast — just pulls the prebuilt GHCR image).
 2. In the project → **+ New** → **Database** → **Add PostgreSQL**.
-3. On the agents-gateway service → **Variables**, set these as **Reference
+3. On the hivegate service → **Variables**, set these as **Reference
    variables** so they auto-fill from Postgres:
 
    ```
@@ -86,7 +86,7 @@ provisioning differs.
 
 ## Koyeb (most friction because of pre-created secrets)
 
-**Button** → <https://app.koyeb.com/deploy?type=git&repository=github.com/liberzon/agents-gateway-deploy>
+**Button** → <https://app.koyeb.com/deploy?type=git&repository=github.com/hivegate-ai/deploy>
 
 `koyeb.yaml` references **named Koyeb secrets** — they must exist *before*
 the deploy.

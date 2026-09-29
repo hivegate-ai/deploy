@@ -23,22 +23,22 @@ defaults:
 
 # List of projects to track and deploy
 projects:
-  - name: agents-gateway
-    description: "AI Agents Gateway Service"
+  - name: hivegate
+    description: "HiveGate AI agents service"
 
     # Source repository configuration
     source:
-      repo: liberzon/agents-gateway
+      repo: hivegate-ai/hivegate
       branch: main
 
     # Docker image configuration
     image:
       registry: ghcr.io
-      name: liberzon/agents-gateway
+      name: hivegate-ai/hivegate
       # Also push to Docker Hub (optional)
       additionalRegistries:
         - registry: docker.io
-          name: "${DOCKERHUB_USERNAME}/agents-gateway"
+          name: "${DOCKERHUB_USERNAME}/hivegate"
 
     # Build configuration
     build:
@@ -50,33 +50,33 @@ projects:
 
     # Kubernetes deployment configuration
     kubernetes:
-      namespace: agents-gateway
+      namespace: hivegate
 
       # Authentication method for cluster access
       auth:
         # Kubeconfig-based auth (works with any cluster)
         type: kubeconfig
-        secretName: KUBECONFIG_AGENTS_GATEWAY  # GitHub secret containing base64-encoded kubeconfig
+        secretName: KUBECONFIG_HIVEGATE  # GitHub secret containing base64-encoded kubeconfig
 
         # Alternative: GKE native auth (uncomment to use)
         # type: gke
         # project: my-gcp-project
         # cluster: my-cluster
         # region: us-central1
-        # serviceAccountKey: GCP_SA_KEY_AGENTS_GATEWAY
+        # serviceAccountKey: GCP_SA_KEY_HIVEGATE
 
       # Environment variables mapped to GitHub secrets
       envFromSecrets:
-        DB_USER: DB_USER_AGENTS_GATEWAY
-        DB_PASS: DB_PASS_AGENTS_GATEWAY
-        DB_HOST: DB_HOST_AGENTS_GATEWAY
-        DB_PORT: DB_PORT_AGENTS_GATEWAY
-        DB_DATABASE: DB_DATABASE_AGENTS_GATEWAY
-        SERVICE_PROMPTS: SERVICE_PROMPTS_AGENTS_GATEWAY
-        GOOGLE_API_KEY: GOOGLE_API_KEY_AGENTS_GATEWAY
-        QDRANT_URL: QDRANT_URL_AGENTS_GATEWAY
-        QDRANT_API_KEY: QDRANT_API_KEY_AGENTS_GATEWAY
-        SECRET_TOKEN_ENC_KEY: SECRET_TOKEN_ENC_KEY_AGENTS_GATEWAY
+        DB_USER: DB_USER_HIVEGATE
+        DB_PASS: DB_PASS_HIVEGATE
+        DB_HOST: DB_HOST_HIVEGATE
+        DB_PORT: DB_PORT_HIVEGATE
+        DB_DATABASE: DB_DATABASE_HIVEGATE
+        SERVICE_PROMPTS: SERVICE_PROMPTS_HIVEGATE
+        GOOGLE_API_KEY: GOOGLE_API_KEY_HIVEGATE
+        QDRANT_URL: QDRANT_URL_HIVEGATE
+        QDRANT_API_KEY: QDRANT_API_KEY_HIVEGATE
+        SECRET_TOKEN_ENC_KEY: SECRET_TOKEN_ENC_KEY_HIVEGATE
 
       # Static environment variables (non-sensitive)
       env:

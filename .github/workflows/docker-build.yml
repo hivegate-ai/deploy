@@ -11,7 +11,7 @@ on:
       project:
         description: 'Project name (from projects.yaml)'
         required: true
-        default: 'agents-gateway'
+        default: 'hivegate'
       ref:
         description: 'Git ref to build (tag, branch, or commit SHA)'
         required: true
@@ -65,7 +65,7 @@ jobs:
         id: project
         run: |
           # Get project from inputs or repository_dispatch payload
-          PROJECT="${{ inputs.project || github.event.client_payload.project || 'agents-gateway' }}"
+          PROJECT="${{ inputs.project || github.event.client_payload.project || 'hivegate' }}"
           echo "name=${PROJECT}" >> $GITHUB_OUTPUT
 
       - name: Parse project configuration
@@ -188,7 +188,7 @@ jobs:
         run: |
           echo "## Docker Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Project:** ${{ inputs.project || github.event.client_payload.project || 'agents-gateway' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Project:** ${{ inputs.project || github.event.client_payload.project || 'hivegate' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Source:** ${{ needs.load-config.outputs.source_repo }}@${{ inputs.ref || github.event.client_payload.ref || 'main' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -213,7 +213,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const project = '${{ inputs.project || github.event.client_payload.project || 'agents-gateway' }}';
+            const project = '${{ inputs.project || github.event.client_payload.project || 'hivegate' }}';
             const version = '${{ needs.build-and-push.outputs.version }}';
 
             await github.rest.actions.createWorkflowDispatch({
@@ -235,5 +235,5 @@ jobs:
           echo "## Deployment Triggered" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Triggered Kubernetes deployment workflow for:" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project:** ${{ inputs.project || github.event.client_payload.project || 'agents-gateway' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Project:** ${{ inputs.project || github.event.client_payload.project || 'hivegate' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** ${{ needs.build-and-push.outputs.version }}" >> $GITHUB_STEP_SUMMARY
