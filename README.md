@@ -1,29 +1,29 @@
-# agents-gateway-deploy
+# hivegate-ai/deploy
 
-**📖 Docs & landing page: [agentsgateway.dev](https://agentsgateway.dev)**
+**📖 Docs & landing page: [hivegate.dev](https://hivegate.dev)**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![App Python](https://img.shields.io/badge/Python%20(app)-3.11+-blue.svg)](https://github.com/liberzon/agents-gateway)
-[![Image](https://img.shields.io/badge/Image-ghcr.io%2Fliberzon%2Fagents--gateway-2496ED.svg?logo=docker)](https://github.com/liberzon/agents-gateway/pkgs/container/agents-gateway)
-[![Source](https://img.shields.io/badge/Source-liberzon%2Fagents--gateway-181717.svg?logo=github)](https://github.com/liberzon/agents-gateway)
+[![App Python](https://img.shields.io/badge/Python%20(app)-3.11+-blue.svg)](https://github.com/hivegate-ai/hivegate)
+[![Image](https://img.shields.io/badge/Image-ghcr.io%2Fhivegate--ai%2Fhivegate-2496ED.svg?logo=docker)](https://github.com/hivegate-ai/hivegate/pkgs/container/hivegate)
+[![Source](https://img.shields.io/badge/Source-hivegate--ai%2Fhivegate-181717.svg?logo=github)](https://github.com/hivegate-ai/hivegate)
 
-Deployment artifacts for [**agents-gateway**](https://github.com/liberzon/agents-gateway) — an AI agents gateway built with FastAPI and Agno. This repo packages everything needed to run it on someone else's infrastructure:
+Deployment artifacts for [**HiveGate**](https://github.com/hivegate-ai/hivegate) — a production runtime for AI agents built with FastAPI and Agno. This repo packages everything needed to run it on someone else's infrastructure:
 
 - **One-click platform deploys** to Render, Railway, and Koyeb (image-based, no source build).
 - **Kubernetes manifests** for self-hosters running their own cluster.
 - **Build pipeline** that publishes the prebuilt image to GHCR.
 
-The app itself lives in [`liberzon/agents-gateway`](https://github.com/liberzon/agents-gateway) — runs on **Python 3.11+** (image base: `python:3.14-slim`). This repo doesn't contain Python; it just deploys the image.
+The app itself lives in [`hivegate-ai/hivegate`](https://github.com/hivegate-ai/hivegate) — runs on **Python 3.11+** (image base: `python:3.14-slim`). This repo doesn't contain Python; it just deploys the image.
 
 ---
 
 ## Deploy in one click
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template?template=https://github.com/liberzon/agents-gateway-deploy)
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/liberzon/agents-gateway-deploy)
-[![Deploy to Koyeb](https://img.shields.io/badge/Deploy%20to-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?type=git&repository=github.com/liberzon/agents-gateway-deploy)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template?template=https://github.com/hivegate-ai/deploy)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/hivegate-ai/deploy)
+[![Deploy to Koyeb](https://img.shields.io/badge/Deploy%20to-Koyeb-121212?style=for-the-badge&logo=koyeb&logoColor=white)](https://app.koyeb.com/deploy?type=git&repository=github.com/hivegate-ai/deploy)
 
-All three pull the prebuilt image **`ghcr.io/liberzon/agents-gateway:latest`** (public, multi-arch: `linux/amd64` + `linux/arm64`). You supply DB connection + LLM API key at deploy time; the app boots and exposes the v2 API.
+All three pull the prebuilt image **`ghcr.io/hivegate-ai/hivegate:latest`** (public, multi-arch: `linux/amd64` + `linux/arm64`). You supply DB connection + LLM API key at deploy time; the app boots and exposes the v2 API.
 
 For step-by-step instructions per platform — provisioning Postgres, env vars to set, a curl-based smoke test, costs, and teardown — see **[`DEPLOY_TEST_PLAN.md`](DEPLOY_TEST_PLAN.md)**.
 
@@ -36,7 +36,7 @@ For step-by-step instructions per platform — provisioning Postgres, env vars t
 ├── render.yaml              # Render Blueprint (image-based deploy)
 ├── koyeb.yaml               # Koyeb service spec (image-based deploy)
 ├── railway.toml             # Railway config (uses Dockerfile below)
-├── Dockerfile               # Thin wrapper: FROM ghcr.io/liberzon/agents-gateway
+├── Dockerfile               # Thin wrapper: FROM ghcr.io/hivegate-ai/hivegate   
 ├── DEPLOY_TEST_PLAN.md      # Per-platform smoke-test playbook
 │
 ├── config/
@@ -45,7 +45,7 @@ For step-by-step instructions per platform — provisioning Postgres, env vars t
 ├── k8s/
 │   ├── base/                # Generic Kubernetes manifests (kustomize)
 │   └── overlays/
-│       └── agents-gateway/  # Per-project customisations
+│       └── hivegate/        # Per-project customisations
 │
 └── .github/workflows/
     ├── docker-build.yml     # Build + push multi-platform image to GHCR
@@ -59,7 +59,7 @@ For step-by-step instructions per platform — provisioning Postgres, env vars t
 
 ```
 ┌─────────────────────────────────┐      ┌─────────────────────────────────────────────┐
-│  liberzon/agents-gateway        │      │  liberzon/agents-gateway-deploy             │
+│  hivegate-ai/hivegate           │      │  hivegate-ai/deploy                         │
 │  (Source code, MIT)             │      │  (This repository, MIT)                     │
 │                                 │      │                                             │
 │  • FastAPI + Agno (Python 3.11+)│      │  • config/projects.yaml — image / source   │
@@ -71,7 +71,7 @@ For step-by-step instructions per platform — provisioning Postgres, env vars t
               │  docker-build.yml builds the image           │
               └──────────────┬───────────────────────────────┘
                              ▼
-            ghcr.io/liberzon/agents-gateway:latest  (public)
+            ghcr.io/hivegate-ai/hivegate:latest  (public)
                              │
         ┌────────────────────┼─────────────────────┐
         ▼                    ▼                     ▼
@@ -87,9 +87,9 @@ For step-by-step instructions per platform — provisioning Postgres, env vars t
 
 | Platform | Config | Mechanism |
 |---|---|---|
-| **Render** | `render.yaml` | `runtime: image`, pulls `ghcr.io/liberzon/agents-gateway:latest` directly. |
+| **Render** | `render.yaml` | `runtime: image`, pulls `ghcr.io/hivegate-ai/hivegate:latest` directly. |
 | **Koyeb** | `koyeb.yaml` | `docker.image:` pulls the same prebuilt image. Requires Koyeb secrets to be pre-created — see [`DEPLOY_TEST_PLAN.md`](DEPLOY_TEST_PLAN.md). |
-| **Railway** | `railway.toml` + `Dockerfile` | Railway's template flow doesn't natively accept image-only deploys, so a thin wrapper `Dockerfile` does `FROM ghcr.io/liberzon/agents-gateway:latest`. The "build" is just an image pull. |
+| **Railway** | `railway.toml` + `Dockerfile` | Railway's template flow doesn't natively accept image-only deploys, so a thin wrapper `Dockerfile` does `FROM ghcr.io/hivegate-ai/hivegate:latest`. The "build" is just an image pull. |
 
 All three default to `PROMPT_STORAGE_BACKEND=postgres`. You'll be prompted to fill DB credentials and at least one LLM API key (Gemini / OpenAI / Anthropic).
 
@@ -99,12 +99,12 @@ Kustomize-based — base manifests under `k8s/base/` with per-project overlays u
 
 ```bash
 gh workflow run deploy-k8s.yml \
-  -f project=agents-gateway \
+  -f project=hivegate \
   -f environment=production \
   -f image_tag=latest
 ```
 
-Requires a `KUBECONFIG_AGENTS_GATEWAY` secret (base64-encoded kubeconfig) — see [Secrets](#kubernetes-secrets) below. For GKE workload-identity auth, see `config/projects.yaml`.
+Requires a `KUBECONFIG_HIVEGATE` secret (base64-encoded kubeconfig) — see [Secrets](#kubernetes-secrets) below. For GKE workload-identity auth, see `config/projects.yaml`.
 
 ---
 
@@ -119,14 +119,14 @@ Multi-platform (linux/amd64 + linux/arm64), pushed to GitHub Container Registry.
 - `workflow_call` (from `sync-upstream.yml`)
 
 ```bash
-gh workflow run docker-build.yml --repo liberzon/agents-gateway-deploy \
-  -f project=agents-gateway \
+gh workflow run docker-build.yml --repo hivegate-ai/deploy \
+  -f project=hivegate \
   -f ref=main \
   -f version=0.1.0 \
   -f trigger_deploy=false
 ```
 
-Publishes to **`ghcr.io/liberzon/agents-gateway`** (public). Tags: `latest`, `<version>`, `<major>.<minor>`, `<major>`, and the source-repo short SHA.
+Publishes to **`ghcr.io/hivegate-ai/hivegate`** (public). Tags: `latest`, `<version>`, `<major>.<minor>`, `<major>`, and the source-repo short SHA.
 
 ### `deploy-k8s.yml` — kustomize apply
 
@@ -146,22 +146,22 @@ Central registry of projects to track and deploy. Each entry declares source, im
 
 ```yaml
 projects:
-  - name: agents-gateway
+  - name: hivegate
     source:
-      repo: liberzon/agents-gateway
+      repo: hivegate-ai/hivegate
       branch: main
     image:
       registry: ghcr.io
-      name: liberzon/agents-gateway
+      name: hivegate-ai/hivegate
     build:
       platforms:
         - linux/amd64
         - linux/arm64
     kubernetes:
-      namespace: agents-gateway
+      namespace: hivegate
       auth:
         type: kubeconfig
-        secretName: KUBECONFIG_AGENTS_GATEWAY
+        secretName: KUBECONFIG_HIVEGATE
     sync:
       enabled: true
       strategy: releases
@@ -173,15 +173,15 @@ Only required if you use the **Kubernetes deploy path**. Not needed for one-clic
 
 | Secret | Description |
 |---|---|
-| `KUBECONFIG_AGENTS_GATEWAY` | Base64-encoded kubeconfig for the target cluster |
-| `DB_PASS_AGENTS_GATEWAY` | Database password (mapped via `envFromSecrets` in `projects.yaml`) |
-| `…_AGENTS_GATEWAY` | Other per-project secrets (see `projects.yaml`) |
+| `KUBECONFIG_HIVEGATE` | Base64-encoded kubeconfig for the target cluster |
+| `DB_PASS_HIVEGATE` | Database password (mapped via `envFromSecrets` in `projects.yaml`) |
+| `…_HIVEGATE` | Other per-project secrets (see `projects.yaml`) |
 
 Setting kubeconfig:
 
 ```bash
-base64 -w0 ~/.kube/config | gh secret set KUBECONFIG_AGENTS_GATEWAY \
-  --repo liberzon/agents-gateway-deploy
+base64 -w0 ~/.kube/config | gh secret set KUBECONFIG_HIVEGATE \
+  --repo hivegate-ai/deploy
 ```
 
 ---
@@ -190,7 +190,7 @@ base64 -w0 ~/.kube/config | gh secret set KUBECONFIG_AGENTS_GATEWAY \
 
 This repo is generic-enough to deploy any OSS service that ships a public OCI image. To add one:
 
-1. **`config/projects.yaml`** — add a new entry under `projects:` (mirror the `agents-gateway` block).
+1. **`config/projects.yaml`** — add a new entry under `projects:` (mirror the `hivegate` block).
 2. **Overlay** — `mkdir -p k8s/overlays/<name>` and create a `kustomization.yaml` referencing `../../base`, plus a `namespace.yaml`.
 3. **Secrets** — add `KUBECONFIG_<NAME>` (and any app secrets) for that project.
 4. **Run** — `gh workflow run docker-build.yml -f project=<name>`.
@@ -202,14 +202,14 @@ This repo is generic-enough to deploy any OSS service that ships a public OCI im
 | Symptom | Likely cause |
 |---|---|
 | `docker-build.yml` fails at "Parse project configuration" → `Project 'X' not found` | `name` in `projects.yaml` doesn't match the workflow input `project=` |
-| Build job reports `invalid tag "/agents-gateway:..."` | (Was a real bug — see commit `71181c0`. If it recurs, check that `image.registry` and `image.name` in `projects.yaml` are non-empty.) |
+| Build job reports `invalid tag "/hivegate:..."` | (Was a real bug — see commit `71181c0`. If it recurs, check that `image.registry` and `image.name` in `projects.yaml` are non-empty.) |
 | Image push succeeds but `trigger-deploy` fails with `Resource not accessible by integration` | The default `GITHUB_TOKEN` lacks `actions:write`. Only matters for the K8s path; harmless for one-click deploys. |
-| One-click deploy gets 500 on `/v2/agents/<id>/chat` | First boot may take longer than the platform's health timeout. Try a second chat. Persistent — pull `docker logs` and open an issue on [agents-gateway](https://github.com/liberzon/agents-gateway/issues). |
+| One-click deploy gets 500 on `/v2/agents/<id>/chat` | First boot may take longer than the platform's health timeout. Try a second chat. Persistent — pull `docker logs` and open an issue on [hivegate](https://github.com/hivegate-ai/hivegate/issues). |
 | `/health` 404s | Service hasn't finished booting; or you've set the wrong port. Render/Koyeb already use the right port; Railway uses `$PORT`. |
-| Pod `CrashLoopBackOff` on K8s | Inspect logs: `kubectl logs -n agents-gateway -l app.kubernetes.io/name=agents-gateway`. Most common cause: missing DB creds. |
+| Pod `CrashLoopBackOff` on K8s | Inspect logs: `kubectl logs -n hivegate -l app.kubernetes.io/name=hivegate`. Most common cause: missing DB creds. |
 
 ---
 
 ## License
 
-[MIT](LICENSE) — the app source code in [`liberzon/agents-gateway`](https://github.com/liberzon/agents-gateway) is also MIT.
+[MIT](LICENSE) — the app source code in [`hivegate-ai/hivegate`](https://github.com/hivegate-ai/hivegate) is also MIT.

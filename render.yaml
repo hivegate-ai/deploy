@@ -1,15 +1,15 @@
 # Render Blueprint specification (image-based deploy)
 # https://render.com/docs/blueprint-spec
 #
-# Deploys the prebuilt agents-gateway image from GHCR. The image is built by
-# .github/workflows/docker-build.yml from the upstream agents-gateway source.
+# Deploys the prebuilt hivegate image from GHCR. The image is built by
+# .github/workflows/docker-build.yml from the upstream hivegate source.
 
 services:
   - type: web
-    name: agents-gateway
+    name: hivegate
     runtime: image
     image:
-      url: ghcr.io/liberzon/agents-gateway:latest
+      url: ghcr.io/hivegate-ai/hivegate:latest
     healthCheckPath: /health
     plan: starter
     autoDeploy: true
@@ -54,7 +54,7 @@ services:
         sync: false
       # Observability - Core Settings
       - key: OTEL_SERVICE_NAME
-        value: agents-gateway
+        value: hivegate
       - key: OTEL_ENVIRONMENT
         sync: false
       - key: OTEL_SERVICE_VERSION

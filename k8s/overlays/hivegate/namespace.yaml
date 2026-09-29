@@ -1,0 +1,8 @@
+# Namespace for hivegate deployment
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hivegate
+  labels:
+    app.kubernetes.io/name: hivegate
+    app.kubernetes.io/managed-by: kustomize

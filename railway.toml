@@ -3,7 +3,7 @@
 #
 # Railway's one-click template flow doesn't natively support image-only
 # deploys, so we use a thin wrapper Dockerfile (./Dockerfile) that just
-# inherits FROM ghcr.io/liberzon/agents-gateway:latest. The "build" is
+# inherits FROM ghcr.io/hivegate-ai/hivegate:latest. The "build" is
 # effectively a fast image pull.
 
 [build]
@@ -18,4 +18,4 @@ restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
 [[services]]
-name = "agents-gateway"
+name = "hivegate"

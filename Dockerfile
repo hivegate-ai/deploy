@@ -3,5 +3,5 @@
 # render.yaml / koyeb.yaml -- they don't need this file.
 #
 # The actual app image is built by .github/workflows/docker-build.yml
-# from the liberzon/agents-gateway source repo and published to GHCR.
-FROM ghcr.io/liberzon/agents-gateway:latest
+# from the hivegate-ai/hivegate source repo and published to GHCR.
+FROM ghcr.io/hivegate-ai/hivegate:latest
