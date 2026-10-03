@@ -21,7 +21,7 @@ on:
         required: false
         default: ''
       trigger_deploy:
-        description: 'Trigger Kubernetes deployment after build'
+        description: 'No effect, kept for callers (sync-upstream). deploy-k8s runs after every build via workflow_run.'
         required: true
         default: true
         type: boolean
@@ -43,10 +43,16 @@ on:
         type: string
         default: ''
       trigger_deploy:
-        description: 'Trigger deployment'
+        description: 'No effect, kept for callers (sync-upstream). deploy-k8s runs after every build via workflow_run.'
         required: false
         type: boolean
         default: true
+
+# One build per project at a time. GitHub keeps only the newest pending run, so two
+# quick pushes can't finish out of order and leave `latest` on the older commit.
+concurrency:
+  group: docker-build-${{ inputs.project || github.event.client_payload.project || 'hivegate' }}
+  cancel-in-progress: false
 
 jobs:
   load-config:
@@ -141,6 +147,7 @@ jobs:
           # The source commit being built; baked into the image as GIT_SHA so the app's
           # GET /_/version reports what is actually running.
           echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "short_sha=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -169,8 +176,8 @@ jobs:
             type=semver,pattern={{major}},value=${{ steps.version.outputs.version }}
             # Latest tag for main branch
             type=raw,value=latest,enable=${{ inputs.ref == 'main' || github.event.client_payload.ref == 'main' || github.event.client_payload.latest == true || github.ref == 'refs/heads/main' }}
-            # Git SHA
-            type=sha,prefix=
+            # Source commit SHA (type=sha would tag this repo's commit)
+            type=raw,value=${{ steps.version.outputs.short_sha }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
