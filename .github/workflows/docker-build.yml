@@ -21,7 +21,7 @@ on:
         required: false
         default: ''
       trigger_deploy:
-        description: 'Trigger Kubernetes deployment after build'
+        description: 'No effect, kept for callers (sync-upstream). deploy-k8s runs after every build via workflow_run.'
         required: true
         default: true
         type: boolean
@@ -43,10 +43,16 @@ on:
         type: string
         default: ''
       trigger_deploy:
-        description: 'Trigger deployment'
+        description: 'No effect, kept for callers (sync-upstream). deploy-k8s runs after every build via workflow_run.'
         required: false
         type: boolean
         default: true
+
+# One build per project at a time. GitHub keeps only the newest pending run, so two
+# quick pushes can't finish out of order and leave `latest` on the older commit.
+concurrency:
+  group: docker-build-${{ inputs.project || github.event.client_payload.project || 'hivegate' }}
+  cancel-in-progress: false
 
 jobs:
   load-config:
@@ -138,6 +144,10 @@ jobs:
             VERSION=$(git describe --tags --always 2>/dev/null || git rev-parse --short HEAD)
             echo "version=${VERSION}" >> $GITHUB_OUTPUT
           fi
+          # The source commit being built; baked into the image as GIT_SHA so the app's
+          # GET /_/version reports what is actually running.
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "short_sha=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -165,9 +175,9 @@ jobs:
             type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.version }}
             type=semver,pattern={{major}},value=${{ steps.version.outputs.version }}
             # Latest tag for main branch
-            type=raw,value=latest,enable=${{ inputs.ref == 'main' || github.event.client_payload.ref == 'main' || github.ref == 'refs/heads/main' }}
-            # Git SHA
-            type=sha,prefix=
+            type=raw,value=latest,enable=${{ inputs.ref == 'main' || github.event.client_payload.ref == 'main' || github.event.client_payload.latest == true || github.ref == 'refs/heads/main' }}
+            # Source commit SHA (type=sha would tag this repo's commit)
+            type=raw,value=${{ steps.version.outputs.short_sha }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -181,7 +191,8 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+            VCS_REF=${{ steps.version.outputs.sha }}
+            GIT_SHA=${{ steps.version.outputs.sha }}
             VERSION=${{ steps.version.outputs.version }}
 
       - name: Generate build summary
@@ -202,38 +213,3 @@ jobs:
           echo "${{ needs.load-config.outputs.platforms }}" | tr ',' '\n' | while read p; do
             echo "- ${p}" >> $GITHUB_STEP_SUMMARY
           done
-
-  trigger-deploy:
-    needs: [load-config, build-and-push]
-    if: inputs.trigger_deploy == true || github.event.client_payload.trigger_deploy == true
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Trigger Kubernetes deployment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const project = '${{ inputs.project || github.event.client_payload.project || 'hivegate' }}';
-            const version = '${{ needs.build-and-push.outputs.version }}';
-
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'deploy-k8s.yml',
-              ref: 'main',
-              inputs: {
-                project: project,
-                environment: 'production',
-                image_tag: version
-              }
-            });
-
-            console.log(`Triggered Kubernetes deployment for ${project}:${version}`);
-
-      - name: Summary
-        run: |
-          echo "## Deployment Triggered" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Triggered Kubernetes deployment workflow for:" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project:** ${{ inputs.project || github.event.client_payload.project || 'hivegate' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ needs.build-and-push.outputs.version }}" >> $GITHUB_STEP_SUMMARY
