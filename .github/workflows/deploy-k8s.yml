@@ -62,6 +62,7 @@ jobs:
       gke_sa_secret: ${{ steps.parse.outputs.gke_sa_secret }}
       health_path: ${{ steps.parse.outputs.health_path }}
       env_secrets: ${{ steps.parse.outputs.env_secrets }}
+      cluster_configured: ${{ steps.creds.outputs.configured }}
 
     steps:
       - name: Checkout deployment repo
@@ -134,11 +135,25 @@ jobs:
           echo "- **Image:** ${IMAGE_REGISTRY}/${IMAGE_NAME}" >> $GITHUB_STEP_SUMMARY
           echo "- **Auth Type:** ${AUTH_TYPE}" >> $GITHUB_STEP_SUMMARY
 
+      # No cluster is wired up yet (KUBECONFIG_* unset), so every build used to end in a
+      # red "Kubeconfig secret is empty" deploy. Skip the deploy job instead of failing.
+      - name: Check cluster credentials
+        id: creds
+        env:
+          KUBECONFIG_CONTENT: ${{ secrets[steps.parse.outputs.kubeconfig_secret] }}
+        run: |
+          if [ "${{ steps.parse.outputs.auth_type }}" = "kubeconfig" ] && [ -z "$KUBECONFIG_CONTENT" ]; then
+            echo "::notice::${{ steps.parse.outputs.kubeconfig_secret }} is not set - skipping the Kubernetes deploy"
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
   deploy:
     needs: load-config
     runs-on: ubuntu-latest
     # Only run if this is a manual trigger, workflow_call, or if workflow_run succeeded
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ needs.load-config.outputs.cluster_configured == 'true' && (github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call' || github.event.workflow_run.conclusion == 'success') }}
 
     permissions:
       contents: read
