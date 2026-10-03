@@ -138,6 +138,9 @@ jobs:
             VERSION=$(git describe --tags --always 2>/dev/null || git rev-parse --short HEAD)
             echo "version=${VERSION}" >> $GITHUB_OUTPUT
           fi
+          # The source commit being built; baked into the image as GIT_SHA so the app's
+          # GET /_/version reports what is actually running.
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -165,7 +168,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.version }}
             type=semver,pattern={{major}},value=${{ steps.version.outputs.version }}
             # Latest tag for main branch
-            type=raw,value=latest,enable=${{ inputs.ref == 'main' || github.event.client_payload.ref == 'main' || github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ inputs.ref == 'main' || github.event.client_payload.ref == 'main' || github.event.client_payload.latest == true || github.ref == 'refs/heads/main' }}
             # Git SHA
             type=sha,prefix=
 
@@ -181,7 +184,8 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
-            VCS_REF=${{ github.sha }}
+            VCS_REF=${{ steps.version.outputs.sha }}
+            GIT_SHA=${{ steps.version.outputs.sha }}
             VERSION=${{ steps.version.outputs.version }}
 
       - name: Generate build summary
@@ -202,38 +206,3 @@ jobs:
           echo "${{ needs.load-config.outputs.platforms }}" | tr ',' '\n' | while read p; do
             echo "- ${p}" >> $GITHUB_STEP_SUMMARY
           done
-
-  trigger-deploy:
-    needs: [load-config, build-and-push]
-    if: inputs.trigger_deploy == true || github.event.client_payload.trigger_deploy == true
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Trigger Kubernetes deployment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const project = '${{ inputs.project || github.event.client_payload.project || 'hivegate' }}';
-            const version = '${{ needs.build-and-push.outputs.version }}';
-
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'deploy-k8s.yml',
-              ref: 'main',
-              inputs: {
-                project: project,
-                environment: 'production',
-                image_tag: version
-              }
-            });
-
-            console.log(`Triggered Kubernetes deployment for ${project}:${version}`);
-
-      - name: Summary
-        run: |
-          echo "## Deployment Triggered" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Triggered Kubernetes deployment workflow for:" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project:** ${{ inputs.project || github.event.client_payload.project || 'hivegate' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ needs.build-and-push.outputs.version }}" >> $GITHUB_STEP_SUMMARY
