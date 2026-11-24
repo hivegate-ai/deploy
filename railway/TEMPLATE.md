@@ -8,10 +8,34 @@ bring their own Postgres and fill in every variable, and it earns no
 the usage it generates, 25% if we answer users' questions in the template queue (or if there
 are none).
 
-This page is the recipe. Creating and publishing happen in the Railway dashboard, in the
-account that should own the template.
+This page is the recipe. `publish_template.py` (next to it) does all of it through
+Railway's public API; the dashboard steps below are the same thing by hand.
 
-## 1. Create the template
+## Automated
+
+Railway generates a template from a project, so the script keeps a small project named
+`hivegate-template-source` in the owning workspace that holds exactly what the template
+deploys, and generates and publishes the template from it.
+
+```bash
+export RAILWAY_TOKEN=...   # account token: railway.com/account/tokens
+python railway/publish_template.py workspaces                       # pick the workspace id
+python railway/publish_template.py create --workspace <id> --tag 0.4.1
+python railway/publish_template.py publish --workspace <id> --template <template id>
+```
+
+`create` builds the source project, generates the template and checks the generated config
+against the variables below. It stops before publishing so the config can be reviewed
+(`--show` prints it, `--publish` skips the stop). On each release:
+
+```bash
+python railway/publish_template.py update --workspace <id> --tag 0.4.2 --publish
+```
+
+The source project runs a small Postgres, so it costs a little. Don't edit it by hand: it
+is what the next `update` regenerates from.
+
+## 1. Create the template (by hand)
 
 Workspace **Settings → Templates → New Template**
 ([docs](https://docs.railway.com/templates/create)). Add two services.
@@ -47,8 +71,8 @@ ships, update the tag in the template.
 | `DB_PASS` | `${{Postgres.PGPASSWORD}}` | |
 | `DB_DATABASE` | `${{Postgres.PGDATABASE}}` | |
 | `WAIT_FOR_DB` | `true` | **Required.** On first start the app creates its tables, but it logs and swallows a connection error. If Postgres isn't up yet, the app starts with no tables. This makes the entrypoint wait for `DB_HOST:DB_PORT` first. |
-| `ADMIN_SECRET` | `${{secret(48)}}` | for `/admin/*`, generated per deploy |
-| `SECRET_TOKEN_ENC_KEY` | `${{secret(43, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")}}=` | a Fernet key (url-safe base64 of 32 bytes), needed to store OAuth tokens. Checked: 2,000 keys of this shape all encrypt and decrypt. |
+| `ADMIN_SECRET` | `${{ secret(48) }}` | for `/admin/*`, generated per deploy |
+| `SECRET_TOKEN_ENC_KEY` | `${{ secret(43, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_") }}=` | a Fernet key (url-safe base64 of 32 bytes), needed to store OAuth tokens. Checked: 2,000 keys of this shape all encrypt and decrypt. |
 | `PROMPT_STORAGE_BACKEND` | `postgres` | |
 | `GOOGLE_API_KEY` | *(empty: the deployer fills it in)* | the default model is Gemini |
 | `DEFAULT_CHAT_MODEL` | `gemini-3-flash-preview` | a deployer who uses another provider sets its key in Variables after deploy and changes this, e.g. `anthropic:sonnet-latest` |
@@ -65,7 +89,7 @@ Click **Publish** and fill in the form
 - **Short description:** Run your Agno agents as a production REST API: per-user sessions
   and OAuth, human approval before writes, multi-agent teams.
 - **Category:** AI/ML (or the closest one offered)
-- **Icon:** the HiveGate logo from hivegate.dev
+- **Icon:** `https://hivegate.dev/assets/favicon.svg`
 - **Overview:** paste the block below.
 
 ```markdown
