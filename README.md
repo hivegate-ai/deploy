@@ -25,6 +25,8 @@ The app itself lives in [`hivegate-ai/hivegate`](https://github.com/hivegate-ai/
 
 All three pull the prebuilt image **`ghcr.io/hivegate-ai/hivegate:latest`** (public, multi-arch: `linux/amd64` + `linux/arm64`). You supply DB connection + LLM API key at deploy time; the app boots and exposes the v2 API.
 
+To publish HiveGate as a Railway **marketplace** template (Postgres included, secrets generated, eligible for Railway's kickback), follow **[`railway/TEMPLATE.md`](railway/TEMPLATE.md)**.
+
 For step-by-step instructions per platform — provisioning Postgres, env vars to set, a curl-based smoke test, costs, and teardown — see **[`DEPLOY_TEST_PLAN.md`](DEPLOY_TEST_PLAN.md)**.
 
 ---
